@@ -1,71 +1,66 @@
 <h1> Transactions List for <%= user.username %> </h1>
 
-  <div class="row">
-    <div class="col">
-      <p> Here is your list of things Transaction! </p>
-    
-      <p class="m-2">
-        <% if (show=='completed'){%>
-          <a class="btn btn-lg btn-primary"
-              href="?show=transactions">(Show tasks Transaction)</a>
-        <% }else {%>
-          <a class="btn btn-lg btn-primary"
-              href="?show=completed">(Show completed tasks)</a>
-        <%}%>
-      </p>
-      <ul class="list-group">
-        <% items.forEach(item => { %>
-            <li class="list-group-item">
-                <span class="">
-                    <% if (item.completed) { %>
-                      <a 
-                        href="/transactions/uncomplete/<%= item._id %>">
-                        <i class="bi bi-check-circle-fill"></i>
+<div class="row">
+  <div class="col">
+    <p> Here is your list of transactions! </p>
+  
+    <ul >
+        <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Title</th>
+                <th scope="col">Amount</th>
+                <th scope="col">Description</th>
+                <th scope="col">Category</th>
+                <th scope="col">Priority</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% transactions.forEach(transaction => { %>
+                <tr>
+                  <td><%= transaction.title %></td>
+                  <td><%= transaction.amount %></td>
+                  <td><%= transaction.description %></td>
+                  <td><%= transaction.category %></td>
+                  <td><%= transaction.priority ? transaction.priority : 5 %></td>
+                  <td>
+                    <a href="/transactions/edit/<%= transaction._id %>">
+                      <i class="bi bi-pencil-square"></i>
                     </a>
-                    <% } else {%>
-                      <a 
-                        href="/transactions/complete/<%= item._id %>">
-                        <i class="bi bi-check-circle"></i>
-                    </a>
-                    <%} %>
-                    <a href="/transactions/remove/<%=item._id %>">
+                    <a href="/transactions/remove/<%= transaction._id %>">
                       <i class="bi bi-trash"></i>
                     </a>
-                </span>
-                <span class="mx-5">
-                  <%= item.item %>
-                </span>
-                <span class="badge rounded-pill bg-danger">
-                  <%= item.priority?item.priority:5 %> 
-                </span>
-                <a 
-                   href="/transactions/edit/<%=item._id %>">
-                  <i class="bi bi-pencil-square"></i>
-              </a>
-                  
-            </li>
-            <br>
-        <% }) %>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+          
 
-        <form method="post" action="transactions">
-            new item: <input type="text" name="item">
-            <br>
-            priority: <select name="priority">
-              <option>1 </option>
-              <option>2 </option>
-              <option>3 </option>
-              <option>4 </option>
-              <option>5 </option>
-            </select>
-            <br>
-            <input type="submit" value="store">
-        </form>
-      </div>
-      <!-- <div class="col">
-        <h2> Summary of Site Usage</h2>
-        <p>
-          <a  class="btn btn-lg btn-primary"
-              href="/transactions/byUser">Show transactions counts for all users</a></p>
-      </div>  -->
+      <form method="post" action="transactions">
+        <div class="form-group">
+            <label for="title">Title:</label>
+            <input type="text" name="title" id="title" class="form-control" required>
+          </div>
+        <div class="form-group">
+          <label for="amount">Amount:</label>
+          <input type="number" name="amount" id="amount" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label for="date">Date:</label>
+          <input type="date" name="date" id="date" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label for="description">Description:</label>
+          <input type="text" name="description" id="description" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label for="category">Category:</label>
+          <input type="text" name="category" id="category" class="form-control" required>
+        </div>
+        <input type="submit" value="Store" class="btn btn-primary">
+      </form>
     </div>
+  </div>
 </div>
