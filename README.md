@@ -2,11 +2,9 @@
 
 Transaction App in Express/Mongoose
 
-## Dowload
+## Authors
 
-Fork repo from https://github.com/aiberk/SEF-PA4
-
-git clone <your-repository-url>
+Eugenio Sanchez, Aaron Baker, and Abraham Iberkleid.
 
 ## Run Locally
 
@@ -84,7 +82,6 @@ Open your terminal application.
 Install Homebrew by running the following command in your terminal:
 
 ```bash
-Copy code
 /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 ```
 
