@@ -1,16 +1,7 @@
-/*
-  transactions.js -- Router for the ToDoList
-*/
+"use strict";
 const express = require("express");
 const router = express.Router();
-const ToDoItem = require("../models/ToDoItem");
-const User = require("../models/User");
-
-/*
-this is a very simple server which maintains a key/value
-store using an object where the keys and values are lists of strings
-
-*/
+const Transaction = require("../models/Transaction");
 
 isLoggedIn = (req, res, next) => {
   if (res.locals.loggedIn) {
@@ -20,119 +11,92 @@ isLoggedIn = (req, res, next) => {
   }
 };
 
-// get the value associated to the key
 router.get("/transactions/", isLoggedIn, async (req, res, next) => {
   const show = req.query.show;
   const completed = show == "completed";
-  let items = [];
+  let transactions = [];
   if (show) {
-    // show is completed or transactions, so just show some items
-    items = await ToDoItem.find({ userId: req.user._id, completed }).sort({
-      completed: 1,
-      priority: 1,
-      createdAt: 1,
+    transactions = await Transaction.find({
+      userId: req.user._id,
+      approved: !completed,
+    }).sort({
+      date: -1,
     });
   } else {
-    // show is null, so show all of the items
-    items = await ToDoItem.find({ userId: req.user._id }).sort({
-      completed: 1,
-      priority: 1,
-      createdAt: 1,
+    transactions = await Transaction.find({ userId: req.user._id }).sort({
+      date: -1,
     });
   }
-  res.render("transactions", { items, show, completed });
+  res.render("transactions", { transactions, show, completed });
 });
 
-/* add the value in the body to the list associated to the key */
 router.post("/transactions", isLoggedIn, async (req, res, next) => {
-  const transactions = new ToDoItem({
-    item: req.body.item,
-    createdAt: new Date(),
-    completed: false,
-    priority: parseInt(req.body.priority),
+  const transaction = new Transaction({
     userId: req.user._id,
+    title: req.body.title,
+    amount: req.body.amount,
+    date: req.body.date,
+    description: req.body.description,
+    category: req.body.category,
   });
-  await transactions.save();
+  await transaction.save();
   res.redirect("/transactions");
 });
 
 router.get(
-  "/transactions/remove/:itemId",
+  "/transactions/remove/:transactionId",
   isLoggedIn,
   async (req, res, next) => {
-    console.log("inside /transactions/remove/:itemId");
-    await ToDoItem.deleteOne({ _id: req.params.itemId });
+    await Transaction.deleteOne({ _id: req.params.transactionId });
     res.redirect("/transactions");
   }
 );
 
 router.get(
-  "/transactions/complete/:itemId",
+  "/transactions/approve/:transactionId",
   isLoggedIn,
   async (req, res, next) => {
-    console.log("inside /transactions/complete/:itemId");
-    await ToDoItem.findOneAndUpdate(
-      { _id: req.params.itemId },
-      { $set: { completed: true } }
+    await Transaction.findOneAndUpdate(
+      { _id: req.params.transactionId },
+      { $set: { approved: true } }
     );
     res.redirect("/transactions");
   }
 );
 
 router.get(
-  "/transactions/uncomplete/:itemId",
+  "/transactions/disapprove/:transactionId",
   isLoggedIn,
   async (req, res, next) => {
-    console.log("inside /transactions/complete/:itemId");
-    await ToDoItem.findOneAndUpdate(
-      { _id: req.params.itemId },
-      { $set: { completed: false } }
+    await Transaction.findOneAndUpdate(
+      { _id: req.params.transactionId },
+      { $set: { approved: false } }
     );
     res.redirect("/transactions");
   }
 );
 
-router.get("/transactions/edit/:itemId", isLoggedIn, async (req, res, next) => {
-  console.log("inside /transactions/edit/:itemId");
-  const item = await ToDoItem.findById(req.params.itemId);
-  //res.render('edit', { item });
-  res.locals.item = item;
-  res.render("edit");
-  //res.json(item)
-});
+router.get(
+  "/transactions/edit/:transactionId",
+  isLoggedIn,
+  async (req, res, next) => {
+    const transaction = await Transaction.findById(req.params.transactionId);
+    res.render("editTransaction", { transaction });
+  }
+);
 
 router.post(
-  "/transactions/updateTodoItem",
+  "/transactions/updateTransaction",
   isLoggedIn,
   async (req, res, next) => {
-    const { itemId, item, priority } = req.body;
-    console.log("inside /transactions/complete/:itemId");
-    await ToDoItem.findOneAndUpdate(
-      { _id: itemId },
-      { $set: { item, priority } }
+    const { transactionId, title, amount, date, description, category } =
+      req.body;
+    await Transaction.findOneAndUpdate(
+      { _id: transactionId },
+      { $set: { title, amount, date, description, category } }
     );
     res.redirect("/transactions");
   }
 );
-
-router.get("/transactions/byUser", isLoggedIn, async (req, res, next) => {
-  let results = await ToDoItem.aggregate([
-    {
-      $group: {
-        _id: "$userId",
-        total: { $count: {} },
-      },
-    },
-    { $sort: { total: -1 } },
-  ]);
-
-  results = await User.populate(results, {
-    path: "_id",
-    select: ["username", "age"],
-  });
-
-  //res.json(results)
-  res.render("summarizeByUser", { results });
-});
 
 module.exports = router;

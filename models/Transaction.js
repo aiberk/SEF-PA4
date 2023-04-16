@@ -5,6 +5,7 @@ const ObjectId = mongoose.Schema.Types.ObjectId;
 
 var transactionSchema = Schema({
   userId: ObjectId,
+  title: String,
   amount: Number,
   date: Date,
   description: String,
