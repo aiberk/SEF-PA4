@@ -83,33 +83,41 @@ Open your terminal application.
 
 Install Homebrew by running the following command in your terminal:
 
-bash
+```bash
 Copy code
 /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+```
+
 Install MongoDB by running the following command in your terminal:
 
-css
-Copy code
+```bash
 brew install mongodb-community@5.0
+```
+
 After installation, create a data directory where MongoDB will store its data files. You can do this by running the following command in your terminal:
 
-bash
-Copy code
+```bash
 sudo mkdir -p /data/db
+```
+
 Note: You may need to provide your system password to run this command.
 
 Change the permissions of the data directory to allow your user account to read and write data to it by running the following command:
 
-bash
-Copy code
+```bash
 sudo chown -R `id -un` /data/db
+```
+
 Start the MongoDB server by running the following command in your terminal:
 
-sql
-Copy code
+```bash
 brew services start mongodb-community@5.0
+```
+
 To verify that MongoDB is running, open a new terminal window and run the following command:
 
-Copy code
+```bash
 mongo
+```
+
 This should open the MongoDB shell, where you can run various commands to interact with your database
