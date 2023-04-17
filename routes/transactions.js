@@ -3,6 +3,12 @@ const express = require("express");
 const router = express.Router();
 const Transaction = require("../models/Transaction");
 
+/**
+ * Middleware function to check if user is authenticated.
+ * @param {object} req - Express request object.
+ * @param {object} res - Express response object.
+ * @param {function} next - Express next function.
+ */
 isLoggedIn = (req, res, next) => {
   if (res.locals.loggedIn) {
     next();
@@ -11,6 +17,16 @@ isLoggedIn = (req, res, next) => {
   }
 };
 
+/**
+ * Route to retrieve and render user's transactions.
+ * @name GET/transactions/
+ * @function
+ * @memberof module:routes
+ * @inner
+ * @param {object} req - Express request object.
+ * @param {object} res - Express response object.
+ * @param {function} next - Express next function.
+ */
 router.get("/transactions/", isLoggedIn, async (req, res, next) => {
   const show = req.query.show;
   const completed = show == "completed";
@@ -30,6 +46,16 @@ router.get("/transactions/", isLoggedIn, async (req, res, next) => {
   res.render("transactions", { transactions, show, completed });
 });
 
+/**
+ * Route to create a new transaction.
+ * @name POST/transactions/
+ * @function
+ * @memberof module:routes
+ * @inner
+ * @param {object} req - Express request object.
+ * @param {object} res - Express response object.
+ * @param {function} next - Express next function.
+ */
 router.post("/transactions", isLoggedIn, async (req, res, next) => {
   const transaction = new Transaction({
     userId: req.user._id,
@@ -43,6 +69,16 @@ router.post("/transactions", isLoggedIn, async (req, res, next) => {
   res.redirect("/transactions");
 });
 
+/**
+ * Route to delete a transaction with the given ID.
+ * @name GET/transactions/remove/:transactionId
+ * @function
+ * @memberof module:routes
+ * @inner
+ * @param {object} req - Express request object.
+ * @param {object} res - Express response object.
+ * @param {function} next - Express next function.
+ */
 router.get(
   "/transactions/remove/:transactionId",
   isLoggedIn,
@@ -52,6 +88,16 @@ router.get(
   }
 );
 
+/**
+ * Route to approve a transaction with the given ID.
+ * @name GET/transactions/approve/:transactionId
+ * @function
+ * @memberof module:routes
+ * @inner
+ * @param {object} req - Express request object.
+ * @param {object} res - Express response object.
+ * @param {function} next - Express next function.
+ */
 router.get(
   "/transactions/approve/:transactionId",
   isLoggedIn,
@@ -64,6 +110,16 @@ router.get(
   }
 );
 
+/**
+ * Route to disapprove a transaction with the given ID.
+ * @name GET/transactions/disapprove/:transactionId
+ * @function
+ * @memberof module:routes
+ * @inner
+ * @param {object} req - Express request object.
+ * @param {object} res - Express response object.
+ * @param {function} next - Express next function.
+ */
 router.get(
   "/transactions/disapprove/:transactionId",
   isLoggedIn,
@@ -76,6 +132,16 @@ router.get(
   }
 );
 
+/**
+ * Route to retrieve and render the edit transaction page.
+ * @name GET/transactions/edit/:transactionId
+ * @function
+ * @memberof module:routes
+ * @inner
+ * @param {object} req - Express request object.
+ * @param {object} res - Express response object.
+ * @param {function} next - Express next function.
+ */
 router.get(
   "/transactions/edit/:transactionId",
   isLoggedIn,
@@ -85,6 +151,16 @@ router.get(
   }
 );
 
+/**
+ * Route to update a transaction with the given ID.
+ * @name POST/transactions/updateTransaction
+ * @function
+ * @memberof module:routes
+ * @inner
+ * @param {object} req - Express request object.
+ * @param {object} res - Express response object.
+ * @param {function} next - Express next function.
+ */
 router.post(
   "/transactions/updateTransaction",
   isLoggedIn,
