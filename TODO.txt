@@ -1,0 +1,24 @@
+- Add buttons to sort by category on table headers
+- Add carrot to indicate sort direction
+- Add button to clear all sorts
+- Make table headers sticky
+- Make "Add Transaction" button sticky
+- Add "Add Transaction" button to top of page
+- Make "Add Transaction" modal
+- Style "Add Transaction" modal
+- Make modal close on click outside of modal
+- Make mobile responsive
+- Fix navbar `` issue  
+- Add nicer styling overall 
+- Use EJS fragments to reduce code duplication
+- Add ionic icons library
+- Add icons to buttons
+- Add icons to table headers
+- Add icons to navbar
+- Correct about page
+- Add favicon
+- Add logo
+- Add logo to navbar
+- Add logo to about page
+- Add logo to login page
+- Add logo to register page
