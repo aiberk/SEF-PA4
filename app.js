@@ -26,6 +26,8 @@ const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error:"));
 db.once("open", function () {
   console.log("we are connected!!!");
+  console.log("Frontend: http://localhost:3000");
+  console.log("Backend: mongodb://localhost:27017/");
 });
 
 /* **************************************** */
