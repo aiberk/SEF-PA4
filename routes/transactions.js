@@ -2,6 +2,9 @@
 const express = require("express");
 const router = express.Router();
 const Transaction = require("../models/Transaction");
+// const TransactionCategories = require("../models/TransactionCategories");
+// const TransactionCategory = require("../models/TransactionCategories");
+const TransactionCategory = require("../models/TransactionCategories");
 
 /**
  * Middleware function to check if user is authenticated.
@@ -35,14 +38,27 @@ router.get("/transactions/", isLoggedIn, async (req, res, next) => {
     transactions = await Transaction.find({
       userId: req.user._id,
       approved: !completed,
-    }).sort({
-      date: -1,
-    });
+    })
+      .populate("category") // Populate the category data
+      .sort({
+        date: -1,
+      })
+      .lean(); // Convert the Mongoose document to a plain JS object
   } else {
-    transactions = await Transaction.find({ userId: req.user._id }).sort({
-      date: -1,
-    });
+    transactions = await Transaction.find({ userId: req.user._id })
+      .populate("category") // Populate the category data
+      .sort({
+        date: -1,
+      })
+      .lean(); // Convert the Mongoose document to a plain JS object
   }
+
+  // Extract the value of the 'category' key
+  transactions = transactions.map((transaction) => {
+    transaction.category = transaction.category.category;
+    return transaction;
+  });
+
   res.render("transactions", { transactions, show, completed });
 });
 
@@ -57,16 +73,74 @@ router.get("/transactions/", isLoggedIn, async (req, res, next) => {
  * @param {function} next - Express next function.
  */
 router.post("/transactions", isLoggedIn, async (req, res, next) => {
+  const categoryName = req.body.category;
+  let category = await TransactionCategory.findOne({
+    category: categoryName,
+  });
+
+  if (!category) {
+    category = await TransactionCategory.create({ category: categoryName });
+  }
+
   const transaction = new Transaction({
     userId: req.user._id,
     title: req.body.title,
     amount: req.body.amount,
+    priority: req.body.priority,
     date: req.body.date,
     description: req.body.description,
-    category: req.body.category,
+    category: category._id,
   });
+
   await transaction.save();
   res.redirect("/transactions");
+});
+
+router.get("/transactions/byCategory", isLoggedIn, async (req, res, next) => {
+  try {
+    const transactions = await Transaction.find().populate("category");
+    const categories = await TransactionCategory.aggregate([
+      {
+        $lookup: {
+          from: "transactions",
+          localField: "_id",
+          foreignField: "category",
+          as: "transactions",
+        },
+      },
+      {
+        $unwind: {
+          path: "$transactions",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $group: {
+          _id: { _id: "$_id", name: "$name" },
+          totalAmount: { $sum: "$transactions.amount" },
+        },
+      },
+      {
+        $project: {
+          _id: "$_id._id",
+          name: "$_id.name",
+          totalAmount: 1,
+        },
+      },
+    ]);
+
+    console.log(categories);
+    console.log(transactions);
+    // add category name to each object in categories array
+    for (let i = 0; i < categories.length; i++) {
+      const categoryObj = await TransactionCategory.findById(categories[i]._id);
+      categories[i].name = categoryObj.category;
+    }
+
+    res.render("transactionsbyCategory", { categories });
+  } catch (err) {
+    next(err);
+  }
 });
 
 /**

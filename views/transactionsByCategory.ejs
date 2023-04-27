@@ -1,0 +1,23 @@
+<a href="/transactions">&larr; Back</a>
+<h1>Transactions by Category</h1>
+<table id="table" class="table">
+  <thead>
+    <tr>
+      <th id="th-category">Category</th>
+      <th id="th-amount">Total</th>
+    </tr>
+  </thead>
+  <tbody id="tableBody">
+    <% categories.forEach(function(category) { %>
+    <tr>
+      <td><%= category.name %></td>
+      <td><%= category.totalAmount %></td>
+    </tr>
+    <% }); %>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+
+<script src="/js/sortByCategory.js"></script>
