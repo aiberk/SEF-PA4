@@ -69,6 +69,55 @@ router.post("/transactions", isLoggedIn, async (req, res, next) => {
   res.redirect("/transactions");
 });
 
+/**Method gets transactions by category 
+ */
+router.get("/transactions/byCategory", isLoggedIn, async (req, res, next) => {
+  try {
+    const transactions = await Transaction.find().populate("category");
+    const categories = await TransactionCategory.aggregate([
+      {
+        $lookup: {
+          from: "transactions",
+          localField: "_id",
+          foreignField: "category",
+          as: "transactions",
+        },
+      },
+      {
+        $unwind: {
+          path: "$transactions",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $group: {
+          _id: { _id: "$_id", name: "$name" },
+          totalAmount: { $sum: "$transactions.amount" },
+        },
+      },
+      {
+        $project: {
+          _id: "$_id._id",
+          name: "$_id.name",
+          totalAmount: 1,
+        },
+      },
+    ]);
+
+    console.log(categories);
+    console.log(transactions);
+    // add category name to each object in categories array
+    for (let i = 0; i < categories.length; i++) {
+      const categoryObj = await TransactionCategory.findById(categories[i]._id);
+      categories[i].name = categoryObj.category;
+    }
+
+    res.render("transactionsbyCategory", { categories });
+  } catch (err) {
+    next(err);
+  }
+});
+
 /**
  * Route to delete a transaction with the given ID.
  * @name GET/transactions/remove/:transactionId
