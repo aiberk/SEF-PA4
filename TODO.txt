@@ -22,3 +22,6 @@
 - Add logo to about page
 - Add logo to login page
 - Add logo to register page
+
+
+Eugenio
