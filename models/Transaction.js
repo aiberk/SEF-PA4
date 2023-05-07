@@ -15,4 +15,3 @@ var transactionSchema = Schema({
 });
 
 module.exports = mongoose.model("Transaction", transactionSchema);
-// Compare this snippet from Groups/SEF-PA04/models/Transaction.js:

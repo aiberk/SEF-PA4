@@ -12,7 +12,7 @@ const TransactionCategory = require("../models/TransactionCategories");
  * @param {object} res - Express response object.
  * @param {function} next - Express next function.
  */
-isLoggedIn = (req, res, next) => {
+const isLoggedIn = (req, res, next) => {
   if (res.locals.loggedIn) {
     next();
   } else {
@@ -116,14 +116,14 @@ router.get("/transactions/byCategory", isLoggedIn, async (req, res, next) => {
       },
       {
         $group: {
-          _id: { _id: "$_id", name: "$name" },
+          _id: { _id: "$_id", title: "$title" },
           totalAmount: { $sum: "$transactions.amount" },
         },
       },
       {
         $project: {
           _id: "$_id._id",
-          name: "$_id.name",
+          title: "$_id.title",
           totalAmount: 1,
         },
       },
